@@ -1,0 +1,40 @@
+// Copyright (c) 2018 The Bitum developers
+// Use of this source code is governed by an ISC
+// license that can be found in the LICENSE file.
+
+package network
+
+import (
+	"math/big"
+	"testing"
+
+	"github.com/bitum-project/bitumd/blockchain"
+	"github.com/bitum-project/bitumd/chaincfg"
+	"github.com/bitum-project/bitumpool/dividend"
+	"github.com/bitum-project/bitumpool/util"
+)
+
+func TestTargetConversion(t *testing.T) {
+	targetTime := new(big.Int).SetInt64(15)
+	for miner, hashrate := range dividend.MinerHashes {
+		target, _, err := dividend.CalculatePoolTarget(&chaincfg.MainNetParams,
+			hashrate, targetTime)
+		if err != nil {
+			t.Error(err)
+		}
+
+		compact := blockchain.BigToCompact(target)
+		leu256 := util.BigToLEUint256(target)
+		cBig := util.LEUint256ToBig(leu256)
+		if target.Cmp(cBig) != 0 {
+			t.Errorf("invalid LEUint256 to big.Int conversion (%v) expected "+
+				"%v, got %v", miner, target, cBig)
+		}
+
+		cCompact := blockchain.BigToCompact(cBig)
+		if cCompact != compact {
+			t.Errorf("invalid big.Int to uint32 conversion (%v) expected "+
+				"%v, got %v", miner, target, cBig)
+		}
+	}
+}

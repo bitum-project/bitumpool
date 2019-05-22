@@ -1,0 +1,9 @@
+vendor
+.DS_Store
+tmp
+bitumpool
+bitump*
+/miner/miner
+logs
+*.log
+*.conf

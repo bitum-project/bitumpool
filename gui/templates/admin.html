@@ -1,0 +1,93 @@
+{{define "admin"}}
+{{template "header" .}}
+
+
+{{ if .Admin }}
+    <div class="row">
+
+        <div class="m-3 p-3 overflow-hidden">
+            <form action="/backup" method="post">
+                <h4>Database Backup</h4>
+                {{.CSRF}}
+                <p>Click this button to download a snapshot of the bitumpool database.</p>
+                <button type="submit" class="btn btn-primary">Download Backup</button>
+            </form>
+        </div>  
+
+    </div>
+    <div class="row">
+
+        <div class="m-3 p-3 overflow-hidden">
+            <h4>Work Quotas ({{.WorkQuotas.PaymentScheme}})</h4>
+            <div style="overflow: auto; max-height: 250px;">
+                <table class="table table-striped">
+                    <tr>
+                        <th>User</th>
+                        <th>Percentage</th>
+                    </tr>
+                    {{ range .WorkQuotas.Quotas }}
+                        <tr>
+                            <td>{{.AccountID}}</td>
+                            <td>{{.Percentage}}</td>
+                        </tr>
+                    {{else}}
+                        <tr>
+                            <td colspan="100%">No Connections</td>
+                        </tr>
+                    {{end}}
+                </table>
+            </div>
+        </div>
+
+        <div class="m-3 p-3 overflow-hidden">
+            <h4>Connections</h4>
+            <div style="overflow: auto; max-height: 250px;">
+                <table class="table table-striped">
+                    <tr>
+                        <th>Account</th>
+                        <th>IP</th>
+                        <th>Miner</th>
+                        <th>Hash Rate</th>
+                    </tr>
+                    {{range $accountID, $clients := .Connections}}
+                        {{range $client := $clients}}
+                            <tr>
+                                <td>{{$accountID}}</td>
+                                <td>{{$client.IP}}</td>	                                
+                                <td>{{$client.Miner}}</td>
+                                <td>{{hashString $client.HashRate}}</td>
+                            </tr>
+                        {{end}}
+                    {{else}}
+                        <tr>
+                            <td colspan="100%">No Connections</td>
+                        </tr>
+                    {{end}}
+                </table>
+            </div>
+        </div>
+        
+    </div>
+
+{{else}}
+
+    <div class="row justify-content-center">
+        <div class="m-3 p-3 overflow-hidden">
+            <form action="/admin" method="post">
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" class="form-control" placeholder="Enter password">
+                </div>
+                {{.CSRF}}
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <a class="float-right" href="/">Return to homepage</a>
+            </form>
+        </div>
+    </div>
+
+{{end}}
+
+</div>
+</body>
+</html>
+{{end}}
